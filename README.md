@@ -3,11 +3,11 @@
 A custom USB DFU bootloader implementation for CH32X035, a drop-in replacement for the factory bootloader.  
 [zh_CN(简体中文)](./README_zh.md)
 
-> ⚠️ **Warning**.
+> ⚠️ **Warning**
 > 
-> **Most of code is AI-generated.**
-> Flash and option areas have been tested and read/write correctly, and RDP (read protection) works as expected. No complete security or boundary testing has been performed.
-> Flashing the BOOT area carries some risk; using it means **you accept all risk and responsibility**.
+> **Most of code is AI-generated.**  
+> Flash and option areas have been tested and read/write correctly, and RDP (read protection) works as expected. No complete security or boundary testing has been performed.  
+> Flashing the BOOT area carries some risk; using it means **you accept all risk and responsibility**.  
 > Be sure to back up the factory bootloader first.
 
 ## Features
