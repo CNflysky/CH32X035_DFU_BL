@@ -12,8 +12,9 @@
 ## 功能特性
 
 - 标准 DFU 1.1 实现，兼容 `dfu-util`
-- 超小体积：构建后约3200字节，可放入BOOT区域内
+- 超小体积：构建后约3320字节，可放入BOOT区域内
 - 支持读写用户 flash 与选项字节
+- 支持擦除 flash
 
 ## 跳转方式
 
@@ -45,18 +46,34 @@ minichlink -r stock_boot.bin bootloader 3328
 minichlink -w dfu_bl.bin bootloader
 ```
 
-之后 app 固件通过 USB DFU 写入用户 flash，例如：
-
-```sh
-dfu-util -d 1a86:df11 -a 0 -D app.bin
-```
-
 恢复原厂Bootloader：
 
 ```sh
 minichlink -w stock_boot.bin bootloader
 ```
 
+## 使用
+固件分三个Alt settings:
+
+```bash
+Found DFU: [1a86:df11] ver=0100, devnum=5, cfg=1, intf=0, path="0-1.3", alt=2, name="@Erase", serial="*****"
+Found DFU: [1a86:df11] ver=0100, devnum=5, cfg=1, intf=0, path="0-1.3", alt=1, name="@Option", serial="*****"
+Found DFU: [1a86:df11] ver=0100, devnum=5, cfg=1, intf=0, path="0-1.3", alt=0, name="@Flash", serial="*****"
+```
+
+其中，alt=0 为用户flash，alt=1 为用户选择字区，alt=2 则为 flash 擦除接口。  
+
+写入flash和用户选择字区，选择对应的接口写入即可：
+
+```bash
+dfu-util -d 1a86:df11 -a 0 -D firmware.bin
+dfu-util -d 1a86:df11 -a 1 -D ob.bin
+```
+
+擦除 flash，只需向该接口写入任意文件即可：
+```bash
+dfu-util -d 1a86:df11 -a 2 -D anything.file
+```
 ## 构建
 
 用 MounRiver Studio 打开工程（`<工程名>.wvproj`），直接 Build 即可，产物在 `obj/` 下的 `.bin`/`.hex`。
@@ -75,6 +92,7 @@ Copyright 2010-2021 Tormod Volden and Stefan Schmidt
 This program is Free Software and has ABSOLUTELY NO WARRANTY
 Please report bugs to http://sourceforge.net/p/dfu-util/tickets/
 
+Found DFU: [1a86:df11] ver=0100, devnum=5, cfg=1, intf=0, path="0-1.3", alt=2, name="@Erase", serial="*****"
 Found DFU: [1a86:df11] ver=0100, devnum=5, cfg=1, intf=0, path="0-1.3", alt=1, name="@Option", serial="*****"
 Found DFU: [1a86:df11] ver=0100, devnum=5, cfg=1, intf=0, path="0-1.3", alt=0, name="@Flash", serial="*****"
 

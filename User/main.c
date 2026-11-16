@@ -11,11 +11,10 @@
 
 #define KEY_SETTLE_LOOPS  20000u
 
-void system_reset_to_user(void)
+__attribute__((__noreturn__)) void system_reset_to_user(void)
 {
     PFIC_SCTLR = 0x80000000u;
-    for (;;)
-        ;
+    __builtin_unreachable();
 }
 
 static void settle_delay(void)

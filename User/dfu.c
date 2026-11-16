@@ -58,6 +58,19 @@ static void flash_erase_page(uint32_t addr)
     FLASH_CTLR = 0;
 }
 
+/* Mass erase of the user area (CTLR.MER). The BOOT area (BOOT_LOCK) and the
+ * option-byte page are outside the user area and are left untouched. */
+static void flash_erase_all(void)
+{
+    flash_unlock();
+    flash_clear_wrp();
+    FLASH_CTLR |= (1u << 2);                /* MER  */
+    FLASH_CTLR |= (1u << 6);                /* STRT */
+    flash_wait();
+    FLASH_CTLR &= ~(1u << 2);
+    flash_check_wrp();
+}
+
 /* Fast program of n words (64 for a 256-byte page, 4 for the 16-byte option
  * page). Follows WCH's FLASH_ROM_WRITE line by line: PAGE_PG and BUF_RST are
  * separate read-modify-writes of CTLR (a single combined store does not give
@@ -187,10 +200,10 @@ void dfu_reset(void)
      * flag there makes the device stay in DFU forever. */
 }
 
-/* Alternate setting 0 = user flash, 1 = option bytes. */
+/* Alternate setting 0 = user flash, 1 = option bytes, 2 = mass erase. */
 void dfu_set_alt(uint16_t alt)
 {
-    dfu_alt = (uint8_t)(alt & 1u);
+    dfu_alt = (alt <= 2) ? (uint8_t)alt : 0;
     dfu_reset();
 }
 
@@ -240,6 +253,15 @@ uint8_t dfu_setup(uint16_t code, uint16_t value, uint16_t len,
         return 0;
 
     case 1:                                 /* DFU_DNLOAD */
+        if (dfu_alt == 2) {                 /* mass erase: payload is dropped */
+            /* One ERASE per interface selection: the host polls GETSTATUS
+             * between blocks, which moves the state out of IDLE, so only the
+             * first DNLOAD (state = dfuIDLE) actually erases. */
+            if (dfu_state != DFU_DNLOAD_IDLE)
+                flash_erase_all();
+            *out_len = len;
+            return 0;
+        }
         if (dfu_alt) {                      /* option-byte area */
             if (len == 0)
                 return ob_write();
@@ -359,6 +381,8 @@ uint8_t dfu_setup(uint16_t code, uint16_t value, uint16_t len,
  * several 256-byte pages, which are erased/programmed as they fill up. */
 void dfu_out_data(const uint8_t *data, uint16_t len)
 {
+    if (dfu_alt == 2)                       /* mass erase: drop the payload */
+        return;
     if (dfu_alt) {                          /* option bytes: stage 16 bytes */
         for (uint16_t i = 0; i < len && ob_len < OB_SIZE; i++)
             ob_buf[ob_len++] = data[i];

@@ -13,7 +13,7 @@ A custom USB DFU bootloader implementation for CH32X035, a drop-in replacement f
 ## Features
 
 - Standard DFU 1.1 implementation, compatible with `dfu-util`
-- Tiny: binary ~3200 bytes, fits inside the BOOT area
+- Tiny: binary ~3320 bytes, fits inside the BOOT area
 - Read and write user flash and option bytes
 
 ## Boot sequence
@@ -47,16 +47,33 @@ Write the firmware:
 minichlink -w dfu_bl.bin bootloader
 ```
 
-Application firmware is then written to user flash over USB DFU, for example:
-
-```sh
-dfu-util -d 1a86:df11 -a 0 -D app.bin
-```
-
 Restore the factory one:
 
 ```sh
 minichlink -w stock_boot.bin bootloader
+```
+
+## Usage
+There are 3 alt settings:
+
+```bash
+Found DFU: [1a86:df11] ver=0100, devnum=5, cfg=1, intf=0, path="0-1.3", alt=2, name="@Erase", serial="*****"
+Found DFU: [1a86:df11] ver=0100, devnum=5, cfg=1, intf=0, path="0-1.3", alt=1, name="@Option", serial="*****"
+Found DFU: [1a86:df11] ver=0100, devnum=5, cfg=1, intf=0, path="0-1.3", alt=0, name="@Flash", serial="*****"
+```
+
+alt=0 -> User flash, alt=1 -> option bytes, alt=2 -> erase flash. 
+
+Select appropriate alt settings via `-a`:
+
+```bash
+dfu-util -d 1a86:df11 -a 0 -D firmware.bin
+dfu-util -d 1a86:df11 -a 1 -D ob.bin
+```
+To erase flash, write any file to `@Erase` alt:
+
+```bash
+dfu-util -d 1a86:df11 -a 2 -D anything.file
 ```
 
 ## Building
@@ -78,6 +95,7 @@ Copyright 2010-2021 Tormod Volden and Stefan Schmidt
 This program is Free Software and has ABSOLUTELY NO WARRANTY
 Please report bugs to http://sourceforge.net/projects/dfu-util/tickets/
 
+Found DFU: [1a86:df11] ver=0100, devnum=5, cfg=1, intf=0, path="0-1.3", alt=2, name="@Erase", serial="*****"
 Found DFU: [1a86:df11] ver=0100, devnum=5, cfg=1, intf=0, path="0-1.3", alt=1, name="@Option", serial="*****"
 Found DFU: [1a86:df11] ver=0100, devnum=5, cfg=1, intf=0, path="0-1.3", alt=0, name="@Flash", serial="*****"
 
