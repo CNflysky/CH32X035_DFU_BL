@@ -8,7 +8,7 @@
 			"toolchain": "RISC-V",
 			"series": "CH32X035",
 			"rtos": "NoneOS",
-			"mcu": "CH32X033F8P6",
+			"mcu": "CH32X033F8P",
 			"description": "Website: https://www.wch.cn/products/CH32X035.html?\\nROM(byte): 62K, SRAM(byte): 20K, CHIP PINS: 48, GPIO PORTS: 46.\\nWCH CH32X033 series of mainstream MCUs covers the needs of a large variety of applications in the industrial,medical and consumer markets. High performance with first-class peripherals and low-power,low-voltage operation is paired with a high level of integration at accessible prices with a simple architecture and easy-to-use tools.",
 			"tempratureScope": "CH32X033F8P6{-40℃~85℃}",
 			"artifactType": "executable",
@@ -26,11 +26,6 @@
 				"parentLogicPath": "",
 				"type": "file",
 				"name": "*.wvproj"
-			},
-			{
-				"parentLogicPath": "Ld",
-				"type": "file",
-				"name": "Link.ld"
 			},
 			{
 				"parentLogicPath": "",
@@ -68,19 +63,17 @@
 				"pre_script_description": "",
 				"post_script": "",
 				"post_script_description": "",
-				"excludeResources": [
-					"${project}/Peripheral"
-				],
+				"excludeResources": [],
 				"optimization": {
 					"level": "size",
 					"message_length": true,
 					"char_is_signed": true,
-					"function_sections": true,
-					"data_sections": true,
+					"function_sections": false,
+					"data_sections": false,
 					"no_common_unitialized": true,
-					"do_not_inline_functions": true,
+					"do_not_inline_functions": false,
 					"assume_freestanding_environment": true,
-					"disable_builtin": true,
+					"disable_builtin": false,
 					"single_precision_constants": false,
 					"position_independent_code": false,
 					"link_time_optimizer": true,
@@ -90,7 +83,7 @@
 					"use_pipelines": false,
 					"show_caret_indicating_the_column": false,
 					"calling_convention_variant": false,
-					"other_optimization_flags": ""
+					"other_optimization_flags": "-fno-jump-tables"
 				},
 				"warnings": {
 					"check_syntax_only": false,
@@ -161,7 +154,7 @@
 						"include_files": []
 					},
 					"optimization": {
-						"language_standard": "gnu99",
+						"language_standard": "default",
 						"other_optimization_flags": ""
 					},
 					"warnings": {
@@ -241,7 +234,7 @@
 						"generate_map": "\"${BuildArtifactFileBaseName}.map\"",
 						"cross_reference": false,
 						"print_link_map": false,
-						"use_newlib_nano": true,
+						"use_newlib_nano": false,
 						"use_float_with_nano_printf": false,
 						"use_float_with_nano_scanf": false,
 						"do_not_use_syscalls": true,
@@ -277,7 +270,7 @@
 						"generate_map": "\"${BuildArtifactFileBaseName}.map\"",
 						"cross_reference": false,
 						"print_link_map": false,
-						"use_newlib_nano": true,
+						"use_newlib_nano": false,
 						"use_float_with_nano_printf": false,
 						"use_float_with_nano_scanf": false,
 						"do_not_use_syscalls": true,
@@ -349,7 +342,7 @@
 	},
 	"flashConfig": {
 		"mcutype": "CH32X035",
-		"address": "0x1FFF0000",
+		"address": "0x08000000",
 		"target_path": "obj/CH32X035_DFU_BL.hex",
 		"clkSpeed": "High",
 		"debug_interface_mode": "1-wire serial",
